@@ -11,9 +11,11 @@ it('loads', () => {
   // this assertion fails on purpose
   // can you fix it?
   // https://on.cypress.io/get
-  cy.contains('h1', 'Todos App')
+  cy.get('h1').contains('h1', 'todos') //first option with element (bad)
+  cy.get('[data-cy=app-title]').should('contain', 'todos') //second option with data-cy (better approach)
+  cy.contains('[data-cy=app-title]', 'todos')
 
-  // can you write "cy.contains" using regular expression?
+  // can you write "cy.contains" using regular expression? - no, you can't
   // cy.contains('h1', /.../)
 
   // also good practice is to use data attributes specifically for testing
