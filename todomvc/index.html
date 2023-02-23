@@ -48,6 +48,7 @@
           :value="newTodo"
           @input="setNewTodo"
           @keyup.enter="addTodo"
+          data-cy="addTodoItem"
         />
       </header>
       <section class="main" v-show="todos.length" v-cloak>
@@ -57,11 +58,12 @@
             class="todo"
             :key="todo.id"
             :class="{ completed: todo.completed }"
+            data-cy="itemFromList"
           >
             <div class="view">
-              <input class="toggle" type="checkbox" v-model="todo.completed" />
+              <input class="toggle" type="checkbox" v-model="todo.completed" data-cy="check-todo" />
               <label>{{ todo.title }}</label>
-              <button class="destroy" @click="removeTodo(todo)"></button>
+              <button class="destroy" @click="removeTodo(todo)" data-cy="destroyBtn"></button>
             </div>
           </li>
         </ul>

@@ -1,9 +1,12 @@
 /// <reference types="cypress" />
 
-it.only('loads', () => {
-  // application should be running at port 3000
+beforeEach(() => {
   cy.visit('localhost:3000')
   cy.contains('h1', 'todos')
+})
+
+Cypress.Commands.add('addItem', (content) => {
+  cy.get('[data-cy="addTodoItem"]').type(content).type('{enter}')
 })
 
 // IMPORTANT ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
@@ -16,12 +19,17 @@ it('adds two items', () => {
   //    type text and "enter"
   //    assert that the new Todo item
   //    has been added added to the list
-  // cy.get(...).should('have.length', 2)
+  //    cy.get(...).should('have.length', 2)
   for (let i = 0; i < 2; i++) {
-    cy.get('.new-todo').type('LMAO{enter}')
-    cy.get('[class="todo-list"] li').contains('LMAO')
+    cy.addItem('LMAO')
+    cy.get('[data-cy="itemFromList"]').contains('LMAO')
   }
   cy.get('.view').should('have.length', 2)
+})
+
+it('test the custom command', () => {
+  cy.addItem('AAAAAAA').as('addedItem')
+  cy.get('@addedItem').should('exist')
 })
 
 it('can mark an item as completed', () => {
@@ -29,12 +37,18 @@ it('can mark an item as completed', () => {
   // marks the first item as completed
   // confirms the first item has the expected completed class
   // confirms the other items are still incomplete
-  cy.get('.new-todo').type('bwawa{enter}').as('bwawa')
-  cy.get('.new-todo').type('meow{enter}').as('meow')
+  cy.get('[data-cy="addTodoItem"]').type('bwawa{enter}')
+  cy.get('[data-cy="addTodoItem"]').type('meow{enter}')
   cy.get('[class="toggle"]').first().check().as('checkedFirst')
   cy.get('@checkedFirst').should('be.checked')
-  cy.contains('li.todo', 'bwawa').should('have.class', 'completed')
-  cy.contains('li.todo', 'meow').should('not.have.class', 'completed')
+  cy.contains('[data-cy="itemFromList"]', 'bwawa').should(
+    'have.class',
+    'completed'
+  )
+  cy.contains('[data-cy="itemFromList"]', 'meow').should(
+    'not.have.class',
+    'completed'
+  )
 })
 
 it('can delete an item', () => {
@@ -44,11 +58,13 @@ it('can delete an item', () => {
   // confirm the deleted item is gone from the dom
   // confirm the other item still exists
 
-  cy.get('.new-todo').type('apple{enter}')
-  cy.get('.new-todo').type('doctor{enter}')
-  cy.get('li.todo').contains('apple').as('apple')
-  cy.get('li.todo').contains('doctor').as('doctor')
-  cy.contains('li.todo', 'apple').find('.destroy').click({ force: true })
+  cy.get('[data-cy="addTodoItem"]').type('apple{enter}')
+  cy.get('[data-cy="addTodoItem"]').type('doctor{enter}')
+  cy.get('[data-cy="itemFromList"]').contains('apple').as('apple')
+  cy.get('[data-cy="itemFromList"]').contains('doctor').as('doctor')
+  cy.contains('[data-cy="itemFromList"]', 'apple')
+    .find('[data-cy="destroyBtn"]')
+    .click({ force: true })
   cy.get('@apple').should('not.exist')
   cy.get('@doctor').should('exist')
 })
@@ -58,22 +74,25 @@ it('can add many items', () => {
   for (let k = 0; k < N; k += 1) {
     // add an item
     // probably want to have a reusable function to add an item!
-    cy.get('.new-todo').type('cherry{enter}')
+    cy.get('[data-cy="addTodoItem"]').type('cherry{enter}')
   }
-  cy.get('li.todo').should('have.length', 5)
+  cy.get('.view').should('have.length', 5)
   // check number of items
 })
 
-it.only('adds item with random text', () => {
+it('adds item with random text', () => {
   // use a helper function with Math.random()
   // or Cypress._.random() to generate unique text label
   // add such item
   // and make sure it is visible and does not have class "completed"
   const uuid = () => Cypress._.random(0, 1e6)
   const id = uuid()
-  cy.log(id)
-  cy.get('.new-todo').type(id).type('{enter}')
-  cy.contains('li.todo', id).should('not.have.class', 'completed')
+  //cy.log(id)
+  cy.get('[data-cy="addTodoItem"]').type(id).type('{enter}')
+  cy.contains('[data-cy="itemFromList"]', id).should(
+    'not.have.class',
+    'completed'
+  )
 })
 
 it('starts with zero items', () => {
@@ -82,14 +101,19 @@ it('starts with zero items', () => {
   //   in the list
   //   use cy.get(...) and it should have length of 0
   //   https://on.cypress.io/get
+  cy.get('[data-cy="itemFromList"]').should('have.length', 0)
 })
 
 it('does not allow adding blank todos', () => {
-  // https://on.cypress.io/catalog-of-events#App-Events
-  cy.on('uncaught:exception', () => {
+  cy.on('uncaught:exception', (err, runnable) => {
+    expect(err.message.includes('Cannot add a blank todo'))
     // check e.message to match expected error text
     // return false if you want to ignore the error
+    return false
   })
+  cy.get('[data-cy="addTodoItem"]').type('{enter}')
+  cy.get('[data-cy="addTodoItem"]').type('    {enter}')
+  cy.get('[data-cy="addTodoItem"]').type('bla{enter}')
 
   // try adding an item with just spaces
 })
