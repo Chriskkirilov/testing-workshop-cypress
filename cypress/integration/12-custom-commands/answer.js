@@ -65,6 +65,5 @@ it('passes when object gets new property', () => {
       console.log('getting', from)
       return from[name]
     }
-
   cy.wrap(o).pipe(get('foo')).should('not.be.undefined').and('equal', 'bar')
 })

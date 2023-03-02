@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 beforeEach(() => {
-  cy.visit('localhost:3000')
+  cy.visit('#baseUrl')
   cy.contains('h1', 'todos')
 })
 

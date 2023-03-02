@@ -377,8 +377,11 @@ describe('TodoMVC - React', function () {
     })
   })
 
-  context('Routing', function () {
+  context.only('Routing', function () {
     beforeEach(function () {
+      cy.request('POST', '/reset', {
+        todos: []
+      })
       todoPage.createTodos()
     })
 

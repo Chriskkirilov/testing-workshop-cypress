@@ -38,7 +38,7 @@ context('this.list', () => {
   // again, it is important to use "function () {}" callback
   // to make sure "this" points at the test context
   it('sets list from context', function () {
-    cy.request('POST', '/reset', { todos: this.list })
+    cy.request('POST', '/reset', { todos: list })
   })
 
   it('has valid list with 2 items', function () {

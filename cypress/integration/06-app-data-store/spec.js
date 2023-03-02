@@ -17,17 +17,17 @@ const addItem = (text) => {
   cy.get('.new-todo').type(`${text}{enter}`)
 }
 
-it('adds items to store', () => {
+it.only('adds items to store', () => {
   addItem('something')
   addItem('something else')
   // get application's window
   // then get app, $store, state, todos
   // it should have 2 items
+  cy.window().its('app.$store.state.todos').should('have.length', '2')
 })
 
 it('creates an item with id 1', () => {
-  cy.server()
-  cy.route('POST', '/todos').as('new-item')
+  cy.intercept('POST', '/todos').as('new-item')
 
   // TODO change Math.random to be deterministic
 
@@ -35,6 +35,7 @@ it('creates an item with id 1', () => {
   // get the application's "window" object using cy.window
   // then change its Math object and replace it
   // with your function that always returns "0.1"
+  //cy.window().its('app.$store.state.Math.random').should('be', 'deterministic')
 
   addItem('something')
   // confirm the item sent to the server has the right values
@@ -46,11 +47,16 @@ it('creates an item with id 1', () => {
 })
 
 // stub function Math.random using cy.stub
-it('creates an item with id using a stub', () => {
+it.only('creates an item with id using a stub', () => {
   // get the application's "window.Math" object using cy.window
   // replace Math.random with cy.stub and store the stub under an alias
   // create a todo using addItem("foo")
   // and then confirm that the stub was called once
+  cy.window(window.Math)
+  cy.stub(window.Math, Math.random).as('stub')
+  addItem('foo')
+  cy.wait('@stub')
+  cy.get('li.todo').should('contain', 'foo')
 })
 
 it('puts the todo items into the data store', () => {

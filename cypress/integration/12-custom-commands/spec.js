@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 /// <reference path="./custom-commands.d.ts" />
+require('cypress-pipe')
 beforeEach(function resetData() {
   cy.request('POST', '/reset', {
     todos: []
@@ -24,17 +25,39 @@ it('enters 10 todos', function () {
   cy.get('.todo').should('have.length', 10)
 })
 
-// it('creates a todo')
+Cypress.Commands.add('createTodo', (text) => {
+  const cmd = Cypress.log({
+    name: 'create todo',
+    message: text,
+    consoleProps() {
+      return {
+        'Create Todo': text
+      }
+    }
+  })
+  cy.get('.new-todo', { log: false })
+    .type(`${text}{enter}`, { log: false })
+    .then(($el) => {
+      cmd.set({ $el }).snapshot().end()
+    })
+})
 
-it.skip('passes when object gets new property', () => {
+it('creates a todo', () => {
+  cy.createTodo('meow')
+  cy.createTodo('lmao')
+})
+
+it.only('passes when object gets new property', () => {
   const o = {}
   setTimeout(() => {
     o.foo = 'bar'
   }, 1000)
-  // TODO write "get" that returns the given property
-  // from an object.
-  // cy.wrap(o).pipe(get('foo'))
-  // add assertions
+  const get = (name) =>
+    function getProp(from) {
+      console.log('getting', from)
+      return from[name]
+    }
+  cy.wrap(o).pipe(get('foo')).should('not.be.undefined').and('equal', 'bar')
 })
 
 it('creates todos', () => {

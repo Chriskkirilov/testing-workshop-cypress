@@ -52,7 +52,7 @@
         />
       </header>
       <section class="main" v-show="todos.length" v-cloak>
-        <ul class="todo-list">
+        <ul class="todo-list" data-cy="ul-todo">
           <li
             v-for="todo in todos"
             class="todo"
@@ -60,7 +60,7 @@
             :class="{ completed: todo.completed }"
             data-cy="itemFromList"
           >
-            <div class="view">
+            <div class="view" data-cy="viewTodos">
               <input class="toggle" type="checkbox" v-model="todo.completed" data-cy="check-todo" />
               <label>{{ todo.title }}</label>
               <button class="destroy" @click="removeTodo(todo)" data-cy="destroyBtn"></button>

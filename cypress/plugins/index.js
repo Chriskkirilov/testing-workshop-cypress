@@ -54,6 +54,7 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // "cy.task" can be used from specs to "jump" into Node environment
   // and doing anything you might want. For example, checking "data.json" file!
+
   on('task', {
     // saves given or default empty data object into todomvc/data.json file
     // if the server is watching this file, next reload should show the updated values

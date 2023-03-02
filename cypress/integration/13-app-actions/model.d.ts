@@ -9,6 +9,7 @@ interface TodoModel {
   toggle(item: unknown)
   inform()
 }
+
 // During tests there we set "window.model" property
 // now cy.window() returns Window instance with
 // the "model" property that has TodoModel interface
